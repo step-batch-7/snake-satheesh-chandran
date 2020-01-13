@@ -54,6 +54,11 @@ class Snake {
     const [deltaX, deltaY] = this.direction.delta;
     this.positions.push([headX + deltaX, headY + deltaY]);
   }
+  grow() {
+    const [headX, headY] = this.positions[0];
+    const [deltaX, deltaY] = this.direction.delta;
+    this.positions.unshift([headX + deltaX, headY + deltaY]);
+  }
 }
 
 class Food {
@@ -87,8 +92,16 @@ class Game {
     const head = this.snake.positions[this.snake.positions.length - 1];
     return this.food.colId == head[0] && this.food.rowId == head[1];
   }
+  isFoodAboveSnake() {
+    return this.snake.positions.some(cell => {
+      return this.food.colId == cell[0] && this.food.rowId == cell[1];
+    });
+  }
   newFood() {
     this.food = new Food(getRandom(0, 100), getRandom(0, 60));
+  }
+  grow() {
+    this.snake.grow();
   }
 }
 
@@ -145,10 +158,11 @@ const drawFood = function(food) {
 };
 
 const feedSnake = function(game) {
-  if (game.isEaten()) {
+  if (game.isEaten() || game.isFoodAboveSnake()) {
     eraseFood(game.food);
     game.newFood();
     drawFood(game.food);
+    game.grow();
   }
 };
 
