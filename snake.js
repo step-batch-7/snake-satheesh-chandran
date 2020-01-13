@@ -59,6 +59,16 @@ class Snake {
     const [deltaX, deltaY] = this.direction.delta;
     this.positions.unshift([headX + deltaX, headY + deltaY]);
   }
+
+  isHeadOnBody() {
+    const body = this.location;
+    const head = body.pop();
+    return body.some(cell => cell[0] == head[0] && cell[1] == head[1]);
+  }
+  isBeyondBoundary() {
+    const head = this.location.pop();
+    return !(head[0] < 99 && head[0] > 0 && head[1] < 59 && head[1] > 0);
+  }
 }
 
 class Food {
@@ -102,6 +112,15 @@ class Game {
   }
   grow() {
     this.snake.grow();
+  }
+  feed() {
+    if (this.isEaten() || this.isFoodAboveSnake()) {
+      this.newFood();
+      this.grow();
+    }
+  }
+  isOver() {
+    return this.snake.isHeadOnBody() || this.snake.isBeyondBoundary();
   }
 }
 
@@ -158,12 +177,10 @@ const drawFood = function(food) {
 };
 
 const feedSnake = function(game) {
-  if (game.isEaten() || game.isFoodAboveSnake()) {
-    eraseFood(game.food);
-    game.newFood();
-    drawFood(game.food);
-    game.grow();
-  }
+  const food = game.food;
+  eraseFood(food);
+  game.feed();
+  drawFood(game.food);
 };
 
 const handleKeyPress = game => {
@@ -221,9 +238,14 @@ const getRandom = function(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-const placeFood = function() {
-  const food = new Food(getRandom(0, 100), getRandom(0, 60));
-  drawFood(food);
+const gameCycle = function(game, interVal) {
+  animateSnakes(game.snake, game.ghostSnake);
+  feedSnake(game);
+  randomlyTurnSnake(game.ghostSnake);
+  if (game.isOver()) {
+    clearInterval(interVal);
+    document.write("<h1 style='text-align: center'> Game Over! </h1>");
+  }
 };
 
 const main = function() {
@@ -231,7 +253,7 @@ const main = function() {
   setup(game);
   drawFood(game.food);
 
-  setInterval(animateSnakes, 200, game.snake, game.ghostSnake);
-  setInterval(feedSnake, 200, game);
-  setInterval(randomlyTurnSnake, 500, ghostSnake);
+  const gameInterval = setInterval(() => {
+    gameCycle(game, gameInterval);
+  }, 100);
 };
