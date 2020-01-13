@@ -83,6 +83,13 @@ class Game {
     if (Math.abs(pressedDirection - currentDirection) == 2)
       this.snake.turnRight();
   }
+  isEaten() {
+    const head = this.snake.positions[this.snake.positions.length - 1];
+    return this.food.colId == head[0] && this.food.rowId == head[1];
+  }
+  newFood() {
+    this.food = new Food(getRandom(0, 100), getRandom(0, 60));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -120,6 +127,11 @@ const eraseTail = function(snake) {
   cell.classList.remove(snake.species);
 };
 
+const eraseFood = function(food) {
+  const cell = getCell(food.colId, food.rowId);
+  cell.classList.remove('food');
+};
+
 const drawSnake = function(snake) {
   snake.location.forEach(([colId, rowId]) => {
     const cell = getCell(colId, rowId);
@@ -130,6 +142,14 @@ const drawSnake = function(snake) {
 const drawFood = function(food) {
   const cell = getCell(food.colId, food.rowId);
   cell.classList.add('food');
+};
+
+const feedSnake = function(game) {
+  if (game.isEaten()) {
+    eraseFood(game.food);
+    game.newFood();
+    drawFood(game.food);
+  }
 };
 
 const handleKeyPress = game => {
@@ -182,6 +202,7 @@ const randomlyTurnSnake = snake => {
     snake.turnLeft();
   }
 };
+
 const getRandom = function(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -196,7 +217,7 @@ const main = function() {
   setup(game);
   drawFood(game.food);
 
-  setInterval(placeFood, 100);
   setInterval(animateSnakes, 200, game.snake, game.ghostSnake);
+  setInterval(feedSnake, 200, game);
   setInterval(randomlyTurnSnake, 500, ghostSnake);
 };
