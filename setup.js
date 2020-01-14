@@ -34,7 +34,7 @@ const drawSnake = function(snake) {
 
 const drawFood = function(food) {
   const cell = getCell(food.colId, food.rowId);
-  cell.classList.add('food');
+  cell.classList.add(food.type);
 };
 
 const eraseTail = function(snake) {
@@ -45,7 +45,7 @@ const eraseTail = function(snake) {
 
 const eraseFood = function(food) {
   const cell = getCell(food.colId, food.rowId);
-  cell.classList.remove('food');
+  cell.classList.remove(food.type);
 };
 
 const attachEventListeners = game => {

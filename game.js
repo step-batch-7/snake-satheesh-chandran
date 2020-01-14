@@ -1,46 +1,66 @@
 class Game {
-  constructor() {
-    this.snake = initSnake();
-    this.ghostSnake = initGhostSnake();
-    this.food = new Food(getRandom(0, 100), getRandom(0, 60));
+  constructor(snake, ghostSnake, food) {
+    this.snake = snake;
+    this.ghostSnake = ghostSnake;
+    this.food = food;
     this.score = 0;
   }
-  turn(key) {
-    const arrowKeys = { ArrowRight: 3, ArrowUp: 0, ArrowLeft: 1, ArrowDown: 2 };
-    const currentDirection = this.snake.direction.heading;
-    const pressedDirection = arrowKeys[key];
-    if (pressedDirection == currentDirection) {
-      this.snake.turnLeft();
-    }
-    if (Math.abs(pressedDirection - currentDirection) == 2)
-      this.snake.turnRight();
+  turnSnakeLeft() {
+    this.snake.turnLeft();
   }
-  isEaten() {
-    const head = this.snake.positions[this.snake.positions.length - 1];
+  turnSnakeRight() {
+    this.snake.turnRight();
+  }
+  isEaten(snake) {
+    const head = snake.positions[snake.positions.length - 1];
     return this.food.colId == head[0] && this.food.rowId == head[1];
   }
-  isFoodAboveSnake() {
-    return this.snake.positions.some(
+  isFoodAboveSnake(snake) {
+    return snake.positions.some(
       cell => this.food.colId == cell[0] && this.food.rowId == cell[1]
     );
   }
   newFood() {
-    this.food = new Food(getRandom(0, 100), getRandom(0, 60));
+    if (this.score % 4 == 0 && Math.floor(this.score / 4) > 0)
+      this.food = new Food(getRandom(1, 100), getRandom(1, 60), 'specialFood');
+    else this.food = new Food(getRandom(1, 100), getRandom(1, 60), 'food');
   }
   grow() {
-    this.snake.grow();
+    if (this.food.type == 'food') this.snake.grow();
   }
   feed() {
-    if (this.isEaten() || this.isFoodAboveSnake()) {
-      this.newFood();
+    if (this.isEaten(this.snake) || this.isFoodAboveSnake(this.snake)) {
       this.grow();
       this.updateScore();
+      this.newFood();
     }
   }
+  feedGhost() {
+    if (
+      this.isEaten(this.ghostSnake) ||
+      this.isFoodAboveSnake(this.ghostSnake)
+    ) {
+      this.newFood();
+    }
+  }
+  isTouchesGhost() {
+    const head = this.snake.positions[this.snake.positions.length - 1];
+    const ghostBody = this.ghostSnake.positions;
+    return ghostBody.some(cell => cell[0] == head[0] && cell[1] == head[1]);
+  }
   isOver() {
-    return this.snake.isHeadTouchesBody() || this.snake.isBeyondBoundary();
+    return (
+      this.ghostSnake.isBeyondBoundary() ||
+      this.snake.isHeadTouchesBody() ||
+      this.snake.isBeyondBoundary() ||
+      this.isTouchesGhost()
+    );
   }
   updateScore() {
+    if (this.food.type == 'specialFood') {
+      this.score += 5;
+      return;
+    }
     this.score++;
   }
 }
@@ -61,4 +81,11 @@ const initGhostSnake = () => {
     [42, 30]
   ];
   return new Snake(ghostSnakePosition, new Direction(SOUTH), 'ghost');
+};
+
+const initGame = () => {
+  const snake = initSnake();
+  const ghostSnake = initGhostSnake();
+  const food = new Food(getRandom(1, 100), getRandom(1, 60), 'food');
+  return new Game(snake, ghostSnake, food);
 };

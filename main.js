@@ -5,8 +5,25 @@ const feedSnake = function(game) {
   drawFood(game.food);
 };
 
+const feedGhostSnake = function(game) {
+  const food = game.food;
+  eraseFood(food);
+  game.feedGhost();
+  drawFood(game.food);
+};
+
 const handleKeyPress = game => {
-  game.turn(event.key);
+  const arrowKeys = {
+    ArrowRight: 3,
+    ArrowUp: 0,
+    ArrowLeft: 1,
+    ArrowDown: 2
+  };
+  const currentDirection = game.snake.direction.heading;
+  const pressedDirection = arrowKeys[event.key];
+  const directionRange = Math.abs(pressedDirection - currentDirection);
+  if (directionRange == 0) game.turnSnakeLeft();
+  if (directionRange == 2) game.turnSnakeRight();
 };
 
 const moveAndDrawSnake = function(snake) {
@@ -21,7 +38,7 @@ const animateSnakes = (snake, ghostSnake) => {
 };
 
 const randomlyTurnSnake = snake => {
-  let x = Math.random() * 100;
+  const x = Math.random() * 100;
   if (x > 50) {
     snake.turnLeft();
   }
@@ -34,6 +51,7 @@ const getRandom = function(min, max) {
 const gameCycle = function(game, interVal) {
   animateSnakes(game.snake, game.ghostSnake);
   feedSnake(game);
+  feedGhostSnake(game);
   randomlyTurnSnake(game.ghostSnake);
   printScore(game.score);
   if (game.isOver()) {
@@ -43,7 +61,7 @@ const gameCycle = function(game, interVal) {
 };
 
 const main = function() {
-  const game = new Game();
+  const game = initGame();
   setup(game);
   drawFood(game.food);
 

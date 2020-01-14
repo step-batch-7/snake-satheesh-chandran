@@ -24,6 +24,6 @@
 
 Advanced features
 
-* Give the ghost snake the ability to eat the food.
-* The game ends when your snake touches the ghost snake.
-* Provide a special type of food that increases the score without changing the length of the snake.
+--DONE-- * Give the ghost snake the ability to eat the food.
+--DONE-- * The game ends when your snake touches the ghost snake.
+--DONE-- * Provide a special type of food that increases the score without changing the length of the snake.
