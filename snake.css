@@ -26,10 +26,30 @@ h1 {
 
 .food {
   background-color: red;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .specialFood {
   background-color: rgb(46, 0, 253);
   border-radius: 4px;
+}
+
+#period {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  width: 800px;
+  height: 10px;
+  border: 2px solid black;
+}
+
+.emptybar {
+  width: 4px;
+  height: 10px;
+}
+
+.bar {
+  background-color: rgb(16, 233, 16);
+  width: 4px;
+  height: 10px;
 }

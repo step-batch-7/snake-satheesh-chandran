@@ -27,3 +27,6 @@ Advanced features
 --DONE-- * Give the ghost snake the ability to eat the food.
 --DONE-- * The game ends when your snake touches the ghost snake.
 --DONE-- * Provide a special type of food that increases the score without changing the length of the snake.
+* Set period for the special food, after that perioid the special food should disappear
+* wraping of snake
+* making private fields

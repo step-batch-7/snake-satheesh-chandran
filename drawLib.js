@@ -4,7 +4,7 @@ const NUM_OF_ROWS = 60;
 const GRID_ID = 'grid';
 
 const getGrid = () => document.getElementById(GRID_ID);
-const getCellId = (colId, rowId) => colId + '_' + rowId;
+const getCellId = (colId, rowId) => `${colId}_${rowId}`;
 
 const getCell = (colId, rowId) =>
   document.getElementById(getCellId(colId, rowId));
@@ -25,26 +25,40 @@ const createGrids = function() {
   }
 };
 
+const createBar = function() {
+  const grid = document.getElementById('period');
+  for (let i = 0; i < 200; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'emptybar';
+    cell.classList.add('bar');
+    cell.id = `${i}`;
+    grid.appendChild(cell);
+  }
+};
+
 const drawSnake = function(snake) {
-  snake.location.forEach(([colId, rowId]) => {
+  const location = snake.location;
+  location.forEach(([colId, rowId]) => {
     const cell = getCell(colId, rowId);
-    cell.classList.add(snake.species);
+    cell.classList.add(snake.type);
   });
 };
 
 const drawFood = function(food) {
-  const cell = getCell(food.colId, food.rowId);
+  const [colId, rowId] = food.position;
+  const cell = getCell(colId, rowId);
   cell.classList.add(food.type);
 };
 
 const eraseTail = function(snake) {
-  const [colId, rowId] = snake.previousTail;
+  const [colId, rowId] = snake.tail;
   const cell = getCell(colId, rowId);
-  cell.classList.remove(snake.species);
+  cell.classList.remove(snake.type);
 };
 
 const eraseFood = function(food) {
-  const cell = getCell(food.colId, food.rowId);
+  const [colId, rowId] = food.position;
+  const cell = getCell(colId, rowId);
   cell.classList.remove(food.type);
 };
 
@@ -59,7 +73,9 @@ const printScore = function(score) {
 
 const setup = game => {
   attachEventListeners(game);
+  const state = game.state();
   createGrids();
-  drawSnake(game.snake);
-  drawSnake(game.ghostSnake);
+  createBar();
+  drawSnake(state.snake);
+  drawSnake(state.ghost);
 };

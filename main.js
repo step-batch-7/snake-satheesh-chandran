@@ -1,15 +1,15 @@
 const feedSnake = function(game) {
-  const food = game.food;
-  eraseFood(food);
+  const gameState = game.state();
+  eraseFood(gameState.food);
   game.feed();
-  drawFood(game.food);
+  drawFood(game.state().food);
 };
 
 const feedGhostSnake = function(game) {
-  const food = game.food;
-  eraseFood(food);
+  const gameState = game.state();
+  eraseFood(gameState.food);
   game.feedGhost();
-  drawFood(game.food);
+  drawFood(game.state().food);
 };
 
 const handleKeyPress = game => {
@@ -19,22 +19,23 @@ const handleKeyPress = game => {
     ArrowLeft: 1,
     ArrowDown: 2
   };
-  const currentDirection = game.snake.direction.heading;
+  const currentDirection = game.state().snake.direction.heading;
   const pressedDirection = arrowKeys[event.key];
   const directionRange = Math.abs(pressedDirection - currentDirection);
-  if (directionRange == 0) game.turnSnakeLeft();
-  if (directionRange == 2) game.turnSnakeRight();
+  if (directionRange === 0) game.turnSnakeLeft();
+  if (directionRange === 2) game.turnSnakeRight();
 };
 
-const moveAndDrawSnake = function(snake) {
-  snake.move();
+const moveAndDrawSnake = function(game, snake) {
+  game.moveSnake();
   eraseTail(snake);
   drawSnake(snake);
 };
 
-const animateSnakes = (snake, ghostSnake) => {
-  moveAndDrawSnake(snake);
-  moveAndDrawSnake(ghostSnake);
+const animateSnakes = (game, ghostSnake) => {
+  const state = game.state();
+  moveAndDrawSnake(game, state.snake);
+  // moveAndDrawSnake(game, state.ghost);
 };
 
 const randomlyTurnSnake = snake => {
@@ -44,15 +45,12 @@ const randomlyTurnSnake = snake => {
   }
 };
 
-const getRandom = function(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-};
+const getRandom = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 const gameCycle = function(game, interVal) {
-  animateSnakes(game.snake, game.ghostSnake);
+  animateSnakes(game);
   feedSnake(game);
   feedGhostSnake(game);
-  randomlyTurnSnake(game.ghostSnake);
   printScore(game.score);
   if (game.isOver()) {
     clearInterval(interVal);
@@ -62,8 +60,9 @@ const gameCycle = function(game, interVal) {
 
 const main = function() {
   const game = initGame();
+  const gameState = game.state();
   setup(game);
-  drawFood(game.food);
+  drawFood(gameState.food);
 
   const gameInterval = setInterval(() => {
     gameCycle(game, gameInterval);

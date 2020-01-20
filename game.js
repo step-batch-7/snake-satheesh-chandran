@@ -1,35 +1,57 @@
 class Game {
+  #snake;
+  #ghostSnake;
+  #food;
+  #score;
   constructor(snake, ghostSnake, food) {
-    this.snake = snake;
-    this.ghostSnake = ghostSnake;
-    this.food = food;
-    this.score = 0;
+    this.#snake = snake;
+    this.#ghostSnake = ghostSnake;
+    this.#food = food;
+    this.#score = 0;
+  }
+  state() {
+    return {
+      snake: this.#snake.state(),
+      ghost: this.#ghostSnake.state(),
+      food: this.#food.state()
+    };
+  }
+  moveSnake() {
+    this.#snake.move();
+    const x = Math.random() * 100;
+    if (x > 50) {
+      this.#ghostSnake.turnLeft();
+    }
   }
   turnSnakeLeft() {
-    this.snake.turnLeft();
+    this.#snake.turnLeft();
   }
   turnSnakeRight() {
-    this.snake.turnRight();
+    this.#snake.turnRight();
   }
   isEaten(snake) {
-    const head = snake.positions[snake.positions.length - 1];
-    return this.food.colId == head[0] && this.food.rowId == head[1];
+    const snakePosition = snake.location;
+    const head = snakePosition[snakePosition.length - 1];
+    const foodPosition = this.#food.state().position;
+    return foodPosition[0] == head[0] && foodPosition[1] == head[1];
   }
   isFoodAboveSnake(snake) {
-    return snake.positions.some(
-      cell => this.food.colId == cell[0] && this.food.rowId == cell[1]
+    const snakePositions = snake.location;
+    const foodPosition = this.#food.position;
+    return snakePositions.some(
+      cell => foodPosition[0] == cell[0] && foodPosition[1] == cell[1]
     );
   }
   newFood() {
-    if (this.score % 4 == 0 && Math.floor(this.score / 4) > 0)
-      this.food = new Food(getRandom(1, 100), getRandom(1, 60), 'specialFood');
-    else this.food = new Food(getRandom(1, 100), getRandom(1, 60), 'food');
+    if (this.#score % 4 == 0 && Math.floor(this.#score / 4) > 0)
+      this.#food = new Food(getRandom(1, 99), getRandom(1, 59), 'specialFood');
+    else this.#food = new Food(getRandom(1, 99), getRandom(1, 59), 'food');
   }
   grow() {
-    if (this.food.type == 'food') this.snake.grow();
+    if (this.#food.type == 'food') this.#snake.grow();
   }
   feed() {
-    if (this.isEaten(this.snake) || this.isFoodAboveSnake(this.snake)) {
+    if (this.isEaten(this.#snake) || this.isFoodAboveSnake(this.#snake)) {
       this.grow();
       this.updateScore();
       this.newFood();
@@ -37,31 +59,32 @@ class Game {
   }
   feedGhost() {
     if (
-      this.isEaten(this.ghostSnake) ||
-      this.isFoodAboveSnake(this.ghostSnake)
+      this.isEaten(this.#ghostSnake) ||
+      this.isFoodAboveSnake(this.#ghostSnake)
     ) {
       this.newFood();
     }
   }
   isTouchesGhost() {
-    const head = this.snake.positions[this.snake.positions.length - 1];
-    const ghostBody = this.ghostSnake.positions;
+    const snakeLocation = this.#snake.location;
+    const head = snakeLocation[snakeLocation.length - 1];
+    const ghostBody = this.#ghostSnake.location;
     return ghostBody.some(cell => cell[0] == head[0] && cell[1] == head[1]);
   }
   isOver() {
     return (
-      this.ghostSnake.isBeyondBoundary() ||
-      this.snake.isHeadTouchesBody() ||
-      this.snake.isBeyondBoundary() ||
+      this.#ghostSnake.isBeyondBoundary() ||
+      this.#snake.isHeadTouchesBody() ||
+      this.#snake.isBeyondBoundary() ||
       this.isTouchesGhost()
     );
   }
   updateScore() {
-    if (this.food.type == 'specialFood') {
-      this.score += 5;
+    if (this.#food.type == 'specialFood') {
+      this.#score += 5;
       return;
     }
-    this.score++;
+    this.#score++;
   }
 }
 
@@ -86,6 +109,6 @@ const initGhostSnake = () => {
 const initGame = () => {
   const snake = initSnake();
   const ghostSnake = initGhostSnake();
-  const food = new Food(getRandom(1, 100), getRandom(1, 60), 'food');
+  const food = new Food(getRandom(1, 99), getRandom(1, 59), 'food');
   return new Game(snake, ghostSnake, food);
 };
