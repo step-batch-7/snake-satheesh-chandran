@@ -52,4 +52,5 @@ class Snake {
     const [headX, headY] = location[location.length - 1];
     return headX < 0 || headX > 99 || headY < 0 || headY > 59;
   }
+  wrap() {}
 }

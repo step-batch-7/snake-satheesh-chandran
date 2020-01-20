@@ -13,12 +13,14 @@ class Game {
     return {
       snake: this.#snake.state(),
       ghost: this.#ghostSnake.state(),
-      food: this.#food.state()
+      food: this.#food.state(),
+      score: this.#score
     };
   }
   moveSnake() {
     this.#snake.move();
     const x = Math.random() * 100;
+    this.#ghostSnake.move();
     if (x > 50) {
       this.#ghostSnake.turnLeft();
     }
@@ -85,6 +87,9 @@ class Game {
       return;
     }
     this.#score++;
+  }
+  wrap() {
+    if (this.#snake.isBeyondBoundary()) this.#snake.wrap();
   }
 }
 

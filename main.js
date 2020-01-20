@@ -26,23 +26,17 @@ const handleKeyPress = game => {
   if (directionRange === 2) game.turnSnakeRight();
 };
 
-const moveAndDrawSnake = function(game, snake) {
+const moveAndDrawSnake = function(game, snake, ghost) {
   game.moveSnake();
   eraseTail(snake);
   drawSnake(snake);
+  eraseTail(ghost);
+  drawSnake(ghost);
 };
 
-const animateSnakes = (game, ghostSnake) => {
+const animateSnakes = game => {
   const state = game.state();
-  moveAndDrawSnake(game, state.snake);
-  // moveAndDrawSnake(game, state.ghost);
-};
-
-const randomlyTurnSnake = snake => {
-  const x = Math.random() * 100;
-  if (x > 50) {
-    snake.turnLeft();
-  }
+  moveAndDrawSnake(game, state.snake, state.ghost);
 };
 
 const getRandom = (min, max) => Math.floor(Math.random() * (max - min) + min);
@@ -51,7 +45,7 @@ const gameCycle = function(game, interVal) {
   animateSnakes(game);
   feedSnake(game);
   feedGhostSnake(game);
-  printScore(game.score);
+  printScore(game.state().score);
   if (game.isOver()) {
     clearInterval(interVal);
     document.getElementById('status').innerText = 'Game Over...!';
@@ -66,7 +60,7 @@ const main = function() {
 
   const gameInterval = setInterval(() => {
     gameCycle(game, gameInterval);
-  }, 150);
+  }, 200);
 };
 
 window.onload = main;
